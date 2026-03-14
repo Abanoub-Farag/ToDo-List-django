@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Task</title>
+</head>
+<body class="bg-light">
+
+<form method="POST">
+    {% csrf_token %}
+    
+    <div class="mb-3">
+        <label for="title"">Task Title</label>
+        <input type="text" name="title" placeholder="What needs to be done?" required>
+    </div>
+
+    <div class="d-grid gap-2">
+        <button type="submit">Save Task</button>
+        <a href="{% url 'home' %}">Cancel</a>
+    </div>
+</form>
+
+</body>
+</html>
