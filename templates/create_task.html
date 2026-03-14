@@ -7,7 +7,7 @@
 </head>
 <body class="bg-light">
 
-<form method="POST">
+<form method="POST" action="{% url 'create_task' %}">
     {% csrf_token %}
     
     <div class="mb-3">

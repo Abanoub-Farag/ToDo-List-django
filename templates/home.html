@@ -2,6 +2,16 @@
 
 {% block content %}
 
-<a href="create_task.html">Create New Task</a>
+<a href="{% url 'create_task' %}">Create New Task</a>
+
+{% for task in tasks %}
+<li>
+<!-- Access attributes of the student object -->
+{{ forloop.counter }}. {{ task.title }}
+</li>
+{% empty %}
+<!-- This block is displayed if the 'students' list is empty -->
+<li>empty tasks</li>
+{% endfor %}
 
 {% endblock content %}

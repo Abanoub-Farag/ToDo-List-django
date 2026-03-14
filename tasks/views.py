@@ -2,20 +2,21 @@ from django.shortcuts import render, redirect
 
 # Create your views here.
 
-from django.views.generic import TemplateView
-from django.http import HttpResponse
+
 from .models import tasks
 
-class HomePageView(TemplateView):
-    template_name = "home.html"
-
-
-class TasksPageView(TemplateView):
+def home_page_view(request):
     objects = tasks.objects.all()
+    return render(request, "home.html", context={"tasks" : objects})
 
-    def get(self, request):
-        return render(request, "tasks.html", context={'tasks': self.objects})
-    
 
-def create_task_page_view(request):
+def create_task_view(request):
+    if request.method == "POST":
+        data = request.POST.get("title")
+        tasks.objects.create(
+            title = data
+        )
+
+        return redirect("home")
     
+    return render(request, "create_task.html")
