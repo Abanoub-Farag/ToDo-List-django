@@ -10,12 +10,17 @@
 <form method="POST" action="{% url 'create_task' %}">
     {% csrf_token %}
     
-    <div class="mb-3">
+    <div>
         <label for="title"">Task Title</label>
         <input type="text" name="title" placeholder="What needs to be done?" required>
     </div>
 
-    <div class="d-grid gap-2">
+    <div>
+        <label for="description">Description</label>
+        <input type="text" name="description" placeholder="Description">
+    </div>
+
+    <div>
         <button type="submit">Save Task</button>
         <a href="{% url 'home' %}">Cancel</a>
     </div>

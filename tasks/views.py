@@ -3,18 +3,20 @@ from django.shortcuts import render, redirect, get_object_or_404
 # Create your views here.
 
 
-from .models import tasks
+from .models import Task
 
 def home_page_view(request):
-    objects = tasks.objects.all()
-    return render(request, "home.html", context={"tasks" : objects})
+    objects = Task.objects.all()
+    context = {"tasks" : objects}
+    return render(request, "home.html", context)
 
 
 def create_task_view(request):
     if request.method == "POST":
-        data = request.POST.get("title")
-        tasks.objects.create(
-            title = data
+        data = request.POST
+        Task.objects.create(
+            title = data.get("title"),
+            description = data.get("description")
         )
 
         return redirect("home")
@@ -23,17 +25,19 @@ def create_task_view(request):
 
 
 def delete_task(request, id):
-    task = get_object_or_404(tasks, id=id)
+    task = get_object_or_404(Task, id=id)
     task.delete()
     return redirect("/")
 
 
 def update_task_view(request, id):
-    task = get_object_or_404(tasks, id=id)
+    task = get_object_or_404(Task, id=id)
     if request.method == "POST":
-        data = request.POST.get("title")
-        task.title = data
+        data = request.POST
+        task.title = data.get("title")
+        task.description = data.get("description")
         task.save()
         return redirect("/")
 
-    return render(request, "update_task.html", context={"task" : task})
+    context = {"task" : task}
+    return render(request, "update_task.html", context)
