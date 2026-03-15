@@ -7,7 +7,7 @@
 {% for task in tasks %}
 <li>
 <!-- Access attributes of the student object -->
-{{ forloop.counter }}. {{ task.title }} <a href="delete_task/{{task.id}}">Delete Task</a>
+{{ forloop.counter }}. {{ task.title }} <a href="delete_task/{{task.id}}">Delete Task</a> <a href="update_task/{{task.id}}">Update Task</a>
 </li>
 {% empty %}
 <!-- This block is displayed if the 'students' list is empty -->

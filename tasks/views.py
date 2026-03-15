@@ -26,3 +26,14 @@ def delete_task(request, id):
     task = get_object_or_404(tasks, id=id)
     task.delete()
     return redirect("/")
+
+
+def update_task_view(request, id):
+    task = get_object_or_404(tasks, id=id)
+    if request.method == "POST":
+        data = request.POST.get("title")
+        task.title = data
+        task.save()
+        return redirect("/")
+
+    return render(request, "update_task.html", context={"task" : task})
