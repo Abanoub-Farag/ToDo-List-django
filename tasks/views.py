@@ -2,19 +2,22 @@ from django.shortcuts import render, redirect, get_object_or_404
 
 # Create your views here.
 
-
+from django.contrib.auth.decorators import login_required
 from .models import Task
 
+@login_required
 def home_page_view(request):
-    objects = Task.objects.all()
+    objects = Task.objects.filter(user=request.user)
     context = {"tasks" : objects}
     return render(request, "home.html", context)
 
 
+@login_required
 def create_task_view(request):
     if request.method == "POST":
         data = request.POST
         Task.objects.create(
+            user=request.user,
             title = data.get("title"),
             description = data.get("description")
         )
@@ -23,15 +26,15 @@ def create_task_view(request):
     
     return render(request, "create_task.html")
 
-
+@login_required
 def delete_task(request, id):
-    task = get_object_or_404(Task, id=id)
+    task = get_object_or_404(Task, id=id, user=request.user)
     task.delete()
     return redirect("/")
 
-
+@login_required
 def update_task_view(request, id):
-    task = get_object_or_404(Task, id=id)
+    task = get_object_or_404(Task, id=id, user=request.user)
     if request.method == "POST":
         data = request.POST
         task.title = data.get("title")
