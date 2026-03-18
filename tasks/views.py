@@ -1,64 +1,55 @@
-from django.shortcuts import render, redirect, get_object_or_404
-
-# Create your views here.
-
-from django.contrib.auth.decorators import login_required
 from .models import Task
 from .forms import TaskForm
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import CreateView
-from django.views.generic.edit import DeleteView
-from django.views import View
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.views.generic import CreateView, ListView
+from django.views.generic.edit import DeleteView, UpdateView
 
-# @login_required
-# def home_page_view(request):
-#     objects = Task.objects.filter(user=request.user)
-#     context = {"tasks" : objects}
-#     return render(request, "home.html", context)
-
-class HomePageView(LoginRequiredMixin, View):
-
-    def get(self, request, *args, **kwargs):
-        return render(request, "home.html", {"tasks" : Task.objects.filter(user=request.user)})
-
-@login_required
-def create_task_view(request):
-    if request.method == "POST":
-        data = request.POST
-        Task.objects.create(
-            user=request.user,
-            title = data.get("title"),
-            description = data.get("description")
-        )
-
-        return redirect("home")
-    
-    return render(request, "create_task.html")
-
-# @login_required
-# def delete_task(request, id):
-#     task = get_object_or_404(Task, id=id, user=request.user)
-#     task.delete()
-#     return redirect("/")
-
-
-class DeleteTaskView(LoginRequiredMixin, DeleteView):
+class TaskMixin(LoginRequiredMixin):
     model = Task
     success_url = "/"
-    template_name = "task_confirm_deletion.html"
     pk_url_kwarg = 'id'
+
+
+class HomePageView(TaskMixin, ListView):
+
+    template_name = "home.html"
+    context_object_name = "tasks"
+
     def get_queryset(self):
-        return self.model.objects.filter(user=self.request.user)
+        return Task.objects.filter(user=self.request.user)
 
-@login_required
-def update_task_view(request, id):
-    task = get_object_or_404(Task, id=id, user=request.user)
-    if request.method == "POST":
-        data = request.POST
-        task.title = data.get("title")
-        task.description = data.get("description")
-        task.save()
-        return redirect("/")
 
-    context = {"task" : task}
-    return render(request, "update_task.html", context)
+class CreateTaskView(TaskMixin, CreateView):
+    
+    form_class = TaskForm
+    template_name = "create_task.html"
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
+
+class DeleteTaskView(TaskMixin, UserPassesTestMixin, DeleteView):
+
+    template_name = "task_confirm_deletion.html"
+    raise_exception = True
+
+    # def test_func(self):
+    #     task = self.get_object()
+    #     return task.user == self.request.user
+
+    def get_queryset(self):
+        return self.model.objects.all()
+
+    def test_func(self):
+        return self.get_object().user == self.request.user
+
+
+class UpdateTaskView(TaskMixin, UserPassesTestMixin, UpdateView):
+
+    form_class = TaskForm
+    template_name = "update_task.html"
+    raise_exception = True
+
+    def test_func(self):
+        return self.get_object().user == self.request.user
